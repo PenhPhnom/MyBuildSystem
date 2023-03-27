@@ -59,6 +59,7 @@ public class BuildSystem : MonoBehaviour
     public bool colorNormal = false;
     public bool isReplace = false;
     private GameObject m_replaces;
+    public float suspendOffset = 0.1f;
 
     public string jsonPath;
     public void Start()
@@ -395,19 +396,19 @@ public class BuildSystem : MonoBehaviour
         {
             //上
             case 1:
-                m_flyCube.transform.position = new Vector3(m_flyCube.transform.position.x, m_flyCube.transform.position.y - 0.1f, m_flyCube.transform.position.z);
+                m_flyCube.transform.position = new Vector3(m_flyCube.transform.position.x, m_flyCube.transform.position.y - suspendOffset, m_flyCube.transform.position.z);
                 break;
             //左
             case 2:
-                m_flyCube.transform.position = new Vector3(m_flyCube.transform.position.x - 0.1f, m_flyCube.transform.position.y, m_flyCube.transform.position.z);
+                m_flyCube.transform.position = new Vector3(m_flyCube.transform.position.x - suspendOffset, m_flyCube.transform.position.y, m_flyCube.transform.position.z);
                 break;
             //右
             case 3:
-                m_flyCube.transform.position = new Vector3(m_flyCube.transform.position.x - 0.1f, m_flyCube.transform.position.y, m_flyCube.transform.position.z);
+                m_flyCube.transform.position = new Vector3(m_flyCube.transform.position.x - suspendOffset, m_flyCube.transform.position.y, m_flyCube.transform.position.z);
                 break;
             //前
             case 4:
-                m_flyCube.transform.position = new Vector3(m_flyCube.transform.position.x, m_flyCube.transform.position.y, m_flyCube.transform.position.z - 0.1f);
+                m_flyCube.transform.position = new Vector3(m_flyCube.transform.position.x, m_flyCube.transform.position.y, m_flyCube.transform.position.z - suspendOffset);
                 break;
         }
     }
@@ -456,19 +457,19 @@ public class BuildSystem : MonoBehaviour
         {
             //上
             case 1:
-                m_flyCube.transform.position = new Vector3(hit.point.x, hit.point.y + (offset + 0.1f), hit.point.z);
+                m_flyCube.transform.position = new Vector3(hit.point.x, hit.point.y + (offset + suspendOffset), hit.point.z);
                 break;
             //左
             case 2:
-                m_flyCube.transform.position = new Vector3(hit.point.x + (offset + 0.1f), hit.point.y, hit.point.z);
+                m_flyCube.transform.position = new Vector3(hit.point.x + (offset + suspendOffset), hit.point.y, hit.point.z);
                 break;
             //右
             case 3:
-                m_flyCube.transform.position = new Vector3(hit.point.x - (offset + 0.1f), hit.point.y, hit.point.z);
+                m_flyCube.transform.position = new Vector3(hit.point.x - (offset + suspendOffset), hit.point.y, hit.point.z);
                 break;
             //前
             case 4:
-                m_flyCube.transform.position = new Vector3(hit.point.x, hit.point.y, hit.point.z - (offset + 0.1f));
+                m_flyCube.transform.position = new Vector3(hit.point.x, hit.point.y, hit.point.z - (offset + suspendOffset));
                 break;
         }
     }
