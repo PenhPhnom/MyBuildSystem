@@ -77,6 +77,18 @@ public class ThingsManager : Singleton<ThingsManager>
         sw.Write(content);
         sw.Close();
     }
+
+    internal void initCameraState()
+    {
+        CameraState.Instance.setPos(Camera.main.transform.position);
+        CameraState.Instance.setRot(Camera.main.transform.rotation);
+    }
+    internal void SetCameraState()
+    {
+        //相机恢复
+        Camera.main.transform.position = CameraState.Instance.getPos();
+        Camera.main.transform.rotation = CameraState.Instance.getRot();
+    }
     /// <summary>
     /// 添加配置
     /// </summary>
@@ -102,7 +114,6 @@ public class ThingsManager : Singleton<ThingsManager>
         string content = JsonLoad(jpath);
         var loadModle = JsonConvert.DeserializeObject<BuildScenes>(content);
         BuildSceneItem item = eachItem(loadModle.buildScene[sIndex].buildThings, tIndex);
-        Debug.Log("BuildSceneItem=" + item);
         loadModle.buildScene[sIndex].buildThings.Remove(item);
         var writeMode = JsonConvert.SerializeObject(loadModle, Formatting.Indented);
         JsonModify(jpath, writeMode);
@@ -124,19 +135,7 @@ public class ThingsManager : Singleton<ThingsManager>
         }
         return null;
     }
-    /// <summary>
-    /// 加载物品资源
-    /// </summary>
-    /// <param name="resName">名字</param>
-    /// <param name="abName">包名</param>
-    /// <param name="resPath">路径</param>
-    //public void loadThingRes(List<GameObject> buildings,string resName, int tIndex, string abName, string resPath, ParamData param = null)
-    //{
-    //    ResourceMgr.Instance.LoadResourceAsync(resName, TypeInts.GameObjectSpawn, (resObj, _) =>
-    //    {
-    //        buildings.Add((GameObject)resObj);
-    //    }, abName, resPath, param);
-    //}
+
     public List<string> getThingsName()
     {
         return prefabs;
@@ -163,6 +162,32 @@ public class ThingsManager : Singleton<ThingsManager>
     public void relaceMaterialsForIndex(GameObject m_replaces,int index,string shaderName)
     {
         m_replaces.GetComponent<Renderer>().materials[index] = new Material(Shader.Find(shaderName)) ;
+    }
+}
+/// <summary>
+/// 相机的属性
+/// </summary>
+public class CameraState:Singleton<CameraState>
+{
+    public Vector3 pos;
+    public Quaternion Rot;
+    internal void setPos(Vector3 posValue)
+    {
+        pos = posValue;
+    }
+    internal void setRot(Quaternion RotValue)
+    {
+        Rot = RotValue;
+    }
+    internal Vector3 getPos()
+    {
+        Debug.Log(pos);
+        return pos;
+    }
+    internal Quaternion getRot()
+    {
+        Debug.Log(Rot);
+        return Rot;
     }
 }
 

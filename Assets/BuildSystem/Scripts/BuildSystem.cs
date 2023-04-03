@@ -29,10 +29,7 @@ public class BuildSystem : MonoBehaviour
     /// 选定的移动层
     /// </summary>
     public int maskLayer = 1;
-    /// <summary>
-    /// 按钮列表
-    /// </summary>
-    public List<Button> buttons;
+
     /// <summary>
     /// 列表
     /// </summary>
@@ -58,15 +55,24 @@ public class BuildSystem : MonoBehaviour
     //默认颜色
     public bool colorNormal = false;
     public bool isReplace = false;
+    public bool isObserveState = false;
     private GameObject m_replaces;
-    public float suspendOffset = 0.1f;
 
+    public Material meshRender = null;
+    public Renderer rend;
+    public Texture texture;
     public string jsonPath;
+    public float suspendOffset = 0.1f;
+    public Text t;
+    public bool isHold = false;
+    public ThirdCamera mainCameraCom;
+
     public void Start()
     {
         m_buildRoot = transform.Find("buildings");
+        ThingsManager.Instance.initCameraState();
         //通过配置初始化按钮信息
-
+        mainCameraCom = Camera.main.GetComponent<ThirdCamera>();
         //绑定参数方法
         for (int i = 0; i < content.transform.childCount; i++)
         {
@@ -82,19 +88,124 @@ public class BuildSystem : MonoBehaviour
             colorList.Add(colorList[0]);
             colorList.Add(colorList[1]);
         }
-        //加载json
+        mainCameraCom.center = socket.transform;
+    }
+    /// <summary>
+    /// 观察者模式
+    /// </summary>
+    public void btnObserveState()
+    {
+        isObserveState = !isObserveState;
+        if (isObserveState)
+        {
+            t.text = "观察者模式打开";
+            mainCameraCom.newPos = transform.position;
+            mainCameraCom.distanceY = mainCameraCom.newPos.y;
+            mainCameraCom.distanceZ = mainCameraCom.newPos.z;
+            mainCameraCom.transform.LookAt(mainCameraCom.target);
+        }
+        else
+        {
+            t.text = "观察者模式关闭";
+
+            ThingsManager.Instance.SetCameraState();
+
+            mainCameraCom.target = null;
+        }
     }
 
     public void btnUnLoadJSON()
     {
+        t.text = "卸载成功";
+#if UNITY_EDITOR
         string content = ThingsManager.Instance.JsonLoad(jsonPath);
+#elif UNITY_ANDROID
+        string content = ThingsManager.Instance.JsonLoad(Application.persistentDataPath + "/buildscenes.json");
+#elif UNITY_IPHONE
+        string content = ThingsManager.Instance.JsonLoad(Application.streamingAssetsPath + "/buildscenes.json");
+#endif
         var loadModle = JsonConvert.DeserializeObject<BuildScenes>(content);
         loadModle.buildScene[0].buildThings.Clear();
         var writeMode = JsonConvert.SerializeObject(loadModle, Formatting.Indented);
+#if UNITY_EDITOR
         ThingsManager.Instance.JsonModify(jsonPath, writeMode);
+#elif UNITY_ANDROID
+        ThingsManager.Instance.JsonModify(Application.persistentDataPath + "/buildscenes.json", writeMode);
+#elif UNITY_IPHONE
+        ThingsManager.Instance.JsonModify(Application.streamingAssetsPath + "/buildscenes.json", writeMode);
+#endif
         for (int i = 0; i < m_buildRoot.childCount; i++)
         {
             Destroy(m_buildRoot.GetChild(i).gameObject);
+        }
+    }
+    //public void updateLoop()
+    //{
+    //    if (mainCameraCom.target)
+    //    {
+    //        //为了调式时看的清楚画的线
+    //        Debug.DrawLine(mainCameraCom.target.position, Camera.main.transform.position, Color.red);
+    //        RaycastHit hit;
+
+    //        if (Physics.Linecast(mainCameraCom.target.position, Camera.main.transform.position, out hit))
+    //        {
+    //            last_obj = hit.collider.gameObject;
+    //            //让遮挡物变半透明
+    //            Color obj_color = last_obj.GetComponent<Renderer>().material.color;
+    //            obj_color.a = 0.5f;
+    //            last_obj.GetComponent<Renderer>().material.SetColor("_Color", obj_color);
+    //        }//还原
+    //        else if (last_obj != null)
+    //        {
+    //            Color obj_color = last_obj.GetComponent<Renderer>().material.color;
+    //            obj_color.a = 1.0f;
+    //            last_obj.GetComponent<Renderer>().material.SetColor("_Color", obj_color);
+    //            last_obj = null;
+    //        }
+    //    }
+    //}
+    public void btnLoadJSON()
+    {
+#if UNITY_EDITOR
+        string content = ThingsManager.Instance.JsonLoad(jsonPath);
+#elif UNITY_ANDROID
+        string content = ThingsManager.Instance.JsonLoad(Application.persistentDataPath + "/buildscenes.json");
+#elif UNITY_IPHONE
+        string content = ThingsManager.Instance.JsonLoad(Application.streamingAssetsPath + "/buildscenes.json");
+#endif
+        var loadModle = JsonConvert.DeserializeObject<BuildScenes>(content);
+        List<BuildSceneItem> things = loadModle.buildScene[0].buildThings;
+        if (m_buildRoot.childCount == 0)
+        {
+            LoopID = LoopID + things.Count;
+            for (int i = 0; i < things.Count; i++)
+            {
+                LoopID++;
+                GameObject thing = Instantiate(Buildings[things[i].thingType], m_buildRoot);
+                thing.transform.position = new Vector3(things[i].postionX, things[i].postionY, things[i].postionZ);
+                thing.transform.rotation = Quaternion.Euler(things[i].rotationX, things[i].rotationY, things[i].rotationZ);
+                Debug.Log(thing.transform.rotation);
+                thing.name = things[i].thingName;
+                AddMissCom(thing);
+                Building b = thing.GetComponent<Building>();
+                b.isCPush = things[i].isCPush;
+                b.limitAround = things[i].LimitAround;
+                b.isPushed = things[i].isPushed;
+                b.thingID = LoopID;
+                Rigidbody r = thing.GetComponent<Rigidbody>();
+                r.useGravity = things[i].isUseGravity;
+                r.constraints =
+                    RigidbodyConstraints.FreezePositionZ |
+                    RigidbodyConstraints.FreezeRotationZ |
+                    RigidbodyConstraints.FreezePositionY |
+                    RigidbodyConstraints.FreezeRotationY |
+                    RigidbodyConstraints.FreezePositionX |
+                    RigidbodyConstraints.FreezeRotationX;
+                //设置颜色
+                thing.GetComponent<Building>().normalColor = thing.GetComponent<Renderer>().material.color;
+                thing.GetComponent<Building>().thingType = things[i].thingType;
+                thing.layer = 0;
+            }
         }
     }
     /// <summary>
@@ -142,8 +253,21 @@ public class BuildSystem : MonoBehaviour
     {
         //替换状态
         isReplace = true;
+        t.text = "替换模式打开";
     }
-
+    public void relaceMaterial()
+    {
+        if (meshRender == null)
+        {
+            return;
+        }
+        rend = m_replaces.GetComponent<Renderer>();
+        //rend.enabled = true;
+        rend.sharedMaterial = meshRender;//代表这个对象的共享材质资源（这个是替换材质球）
+        m_replaces = null;
+        isReplace = false;
+        t.text = "替换模式关闭";
+    }
     public void setm_flyCube(int id)
     {
         if (!isReplace)
@@ -154,6 +278,7 @@ public class BuildSystem : MonoBehaviour
                 //判断物品是否为空
                 if (Buildings[id])
                 {
+                    t.text = "选择物品=" + Buildings[id].name;
                     m_flyCube = Instantiate(Buildings[id], m_buildRoot);
                     m_flyCube.transform.position = Vector3.zero;
 
@@ -188,6 +313,7 @@ public class BuildSystem : MonoBehaviour
             m_new.GetComponent<Renderer>().material.color = m_replaces.GetComponent<Building>().normalColor;
             DestroyImmediate(m_replaces);
             isReplace = false;
+            t.text = "替换模式关闭";
         }
     }
     public void AddMissCom(GameObject m_flyCube)
@@ -211,6 +337,7 @@ public class BuildSystem : MonoBehaviour
     {
         setm_flyCube(id);
         //setm_flyCubeTest(id);
+        isHold = true;
     }
 
     void Update()
@@ -218,148 +345,183 @@ public class BuildSystem : MonoBehaviour
         // 以摄像机所在位置为起点，创建一条发射的射线  
         Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
         RaycastHit hit;
-
-        //判断物品是否持有，如果不持有，不往下执行操作
-        if (!m_flyCube)
+        if (isObserveState)
         {
-            //放置物品
+            //选择相机跟随的物品
             if (Input.GetMouseButtonDown(0))
             {
                 if (Physics.Raycast(ray, out hit, Mathf.Infinity, maskLayer))
                 {
-                    if (!hit.collider.GetComponent<Building>().isTerrin)
+                    var hitThings = hit.collider;
+                    //判断不是地板
+                    if (!hitThings.GetComponent<Building>().isTerrin)
                     {
-                        if (!isReplace)
-                        {
-                            m_flyCube = hit.collider.gameObject;
-                            m_flyCubeBuilding.setIsPushed(false);
-                            m_flyCube.layer = 1;
-                            //设置颜色
-                            m_flyCubeRender.material.color = colorList[0];
-                            //去掉编号
-                            m_flyCube.name = m_flyCube.name.Split("_")[0];
-                            var thing = new BuildSceneItem();
-                            //设置物件属性
-                            setThingAttributes(thing);
-                            ThingsManager.Instance.DelBuildThings(jsonPath, 0, m_flyCubeBuilding.thingID);
-                            m_flyCubeRender = m_flyCube.GetComponent<Renderer>();
-                            m_flyCubeBuilding = m_flyCube.GetComponent<Building>();
-                        }
-                        else
-                        {
-                            m_replaces = hit.collider.gameObject;
-                            m_replaces.GetComponent<Building>().setIsPushed(true);
-                            m_replaces.layer = 0;
-                        }
+                        mainCameraCom.target = hitThings.transform;
                     }
-                }
-            }
-            return;
-        }
-        //放置物品
-        if (Input.GetMouseButtonDown(0))
-        {
-            //判断物体是否可以放置
-            if (m_flyCubeRender.material.color == colorList[1])
-            {
-                Debug.Log("不可以放置");
-            }
-            else
-            {
-                m_flyCubeRender.material.color = m_flyCubeBuilding.normalColor;
-                m_flyCubeBuilding.setIsPushed(true);
-                LoopID++;
-                m_flyCubeBuilding.thingID = LoopID;
-                m_flyCube.name = m_flyCube.name.Replace("(Clone)", "") + "_" + LoopID;
-                var thing = new BuildSceneItem();
-                //设置物件属性
-                setThingAttributes(thing);
-                ThingsManager.Instance.AddBuildThings(jsonPath, 0, thing);
-                m_flyCube.layer = 0;
-                //恢复正常的位置
-                offsetBuildingReset(pt);
-                m_flyCube = null;
-             
-            }
-            return;
-        }
-        //取消物品
-        if (Input.GetMouseButtonDown(1))
-        {
-            Destroy(m_flyCube);
-            m_flyCube = null;
-            return;
-        }
-        //这个是在端上测试的点击中键进行旋转
-        if (Input.GetMouseButtonDown(2))
-        {
-            m_distance += RotateAngle;
-            m_flyCube.transform.rotation = Quaternion.AngleAxis(m_distance, Vector3.up);
-        }
-
-        //选定某一个层，进行移动
-        if (Physics.Raycast(ray, out hit, Mathf.Infinity, maskLayer))
-        {
-            m_flyCubeBuilding.setNowParent(hit.collider.gameObject);
-            // 判断socket与物品的方向
-            pt = posType(hit.collider.transform);
-            //判断是否可以堆叠摆放
-
-            //如果物体穿墙，则不进行偏移
-
-            //根据关系进行偏移
-            offsetBuilding(pt, hit);
-        }
-                /*
-        * 判断哪个轴是贴着墙走的
-        * 原理：
-        * 贴着墙走的那根轴不会动，
-        * 其他的会一直变动，
-        * 如果三个轴都没用变动证明这个物体处于静止状态，
-        * 如果其中两条轴没用动证明物体处于变速直线运动
-        * 只要一条轴不动，证明这条轴是贴着墙面或者地面走的
-        */
-        //如果两个坐标相等，证明这个物体静止状态
-        if (lastPos != m_flyCube.transform.position)
-        {
-            //几条轴相等
-            int sameVNum = 0;
-            int VType = 0;
-            if (lastPos.x == m_flyCube.transform.position.x)
-            {
-                sameVNum++;
-                VType = 1;
-            }
-            if (lastPos.y == m_flyCube.transform.position.y)
-            {
-                sameVNum++;
-                VType = 2;
-            }
-            if (lastPos.z == m_flyCube.transform.position.z)
-            {
-                sameVNum++;
-                VType = 3;
-            }
-            lastPos = m_flyCube.transform.position;
-            if (sameVNum == 1)
-            {
-                switch (VType)
-                {
-                    case 1:
-                        offset = m_flyCubeRender.bounds.size.x / 2;
-                        break;
-                    case 2:
-                        offset = m_flyCubeRender.bounds.size.y / 2;
-                        break;
-                    case 3:
-                        offset = m_flyCubeRender.bounds.size.z / 2;
-                        break;
                 }
             }
         }
         else
         {
+            //判断物品是否持有，如果不持有，不往下执行操作
+            if (!m_flyCube)
+            {
+                //放置物品
+                if (Input.GetMouseButtonDown(0))
+                {
+                    if (Physics.Raycast(ray, out hit, Mathf.Infinity, maskLayer))
+                    {
+                        if (!hit.collider.GetComponent<Building>().isTerrin)
+                        {
+                            if (!isReplace)
+                            {
+                                m_flyCube = hit.collider.gameObject;
+                                m_flyCube.layer = 1;
+                                m_flyCubeRender = m_flyCube.GetComponent<Renderer>();
+                                m_flyCubeBuilding = m_flyCube.GetComponent<Building>();
+                                m_flyCubeBuilding.setIsPushed(false);
+                                //设置颜色
+                                m_flyCubeRender.material.color = colorList[0];
+                                //去掉编号
+                                m_flyCube.name = m_flyCube.name.Split("_")[0];
+                                var thing = new BuildSceneItem();
+                                isHold = true;
+                                //设置物件属性
+                                setThingAttributes(thing);
+#if UNITY_EDITOR
+                                ThingsManager.Instance.DelBuildThings(jsonPath, 0, m_flyCubeBuilding.thingID);
+#elif UNITY_ANDROID
+        ThingsManager.Instance.DelBuildThings(Application.persistentDataPath + "/buildscenes.json", 0, m_flyCubeBuilding.thingID);
+#elif UNITY_IPHONE
+        ThingsManager.Instance.DelBuildThings(Application.streamingAssetsPath + "/buildscenes.json", 0, m_flyCubeBuilding.thingID);
+#endif
+
+                            }
+                            else
+                            {
+                                m_replaces = hit.collider.gameObject;
+                                m_replaces.GetComponent<Building>().setIsPushed(true);
+                                m_replaces.layer = 0;
+                            }
+                        }
+                    }
+                }
+                return;
+            }
+            //放置物品
+            if (Input.GetMouseButtonDown(0))
+            {
+                //判断物体是否可以放置
+                if (m_flyCubeRender.material.color == colorList[1])
+                {
+                    Debug.Log("不可以放置");
+                }
+                else
+                {
+                    m_flyCubeRender.material.color = m_flyCubeBuilding.normalColor;
+                    m_flyCubeBuilding.setIsPushed(true);
+                    LoopID++;
+                    m_flyCubeBuilding.thingID = LoopID;
+                    m_flyCube.name = m_flyCube.name.Replace("(Clone)", "") + "_" + LoopID;
+                    var thing = new BuildSceneItem();
+                    //设置物件属性
+                    setThingAttributes(thing);
+#if UNITY_EDITOR
+                    ThingsManager.Instance.AddBuildThings(jsonPath, 0, thing);
+#elif UNITY_ANDROID
+                            ThingsManager.Instance.AddBuildThings(Application.persistentDataPath + "/buildscenes.json", 0, thing);
+#elif UNITY_IPHONE
+                            ThingsManager.Instance.AddBuildThings(Application.streamingAssetsPath + "/buildscenes.json", 0, thing);
+#endif
+                    m_flyCube.layer = 0;
+                    //恢复正常的位置
+                    offsetBuildingReset(pt);
+                    m_flyCube = null;
+                    isHold = false;
+                }
+                return;
+            }
+            //取消物品
+            if (Input.GetMouseButtonDown(1))
+            {
+                Destroy(m_flyCube);
+                m_flyCube = null;
+                isHold = false;
+                return;
+            }
+            //这个是在端上测试的点击中键进行旋转
+            if (Input.GetMouseButtonDown(2))
+            {
+                m_distance += RotateAngle;
+                m_flyCube.transform.rotation = Quaternion.AngleAxis(m_distance, Vector3.up);
+            }
+
+            //选定某一个层，进行移动
+            if (Physics.Raycast(ray, out hit, Mathf.Infinity, maskLayer))
+            {
+                m_flyCubeBuilding.setNowParent(hit.collider.gameObject);
+                // 判断socket与物品的方向
+                pt = posType(hit.collider.transform);
+                //判断是否可以堆叠摆放
+
+                //如果物体穿墙，则不进行偏移
+
+                //根据关系进行偏移
+                offsetBuilding(pt, hit);
+            }
+            /*
+    * 判断哪个轴是贴着墙走的
+    * 原理：
+    * 贴着墙走的那根轴不会动，
+    * 其他的会一直变动，
+    * 如果三个轴都没用变动证明这个物体处于静止状态，
+    * 如果其中两条轴没用动证明物体处于变速直线运动
+    * 只要一条轴不动，证明这条轴是贴着墙面或者地面走的
+    */
+            //如果两个坐标相等，证明这个物体静止状态
+            if (lastPos != m_flyCube.transform.position)
+            {
+                //几条轴相等
+                int sameVNum = 0;
+                int VType = 0;
+                if (lastPos.x == m_flyCube.transform.position.x)
+                {
+                    sameVNum++;
+                    VType = 1;
+                }
+                if (lastPos.y == m_flyCube.transform.position.y)
+                {
+                    sameVNum++;
+                    VType = 2;
+                }
+                if (lastPos.z == m_flyCube.transform.position.z)
+                {
+                    sameVNum++;
+                    VType = 3;
+                }
+                lastPos = m_flyCube.transform.position;
+                if (sameVNum == 1)
+                {
+                    switch (VType)
+                    {
+                        case 1:
+                            offset = m_flyCubeRender.bounds.size.x / 2;
+                            break;
+                        case 2:
+                            offset = m_flyCubeRender.bounds.size.y / 2;
+                            break;
+                        case 3:
+                            offset = m_flyCubeRender.bounds.size.z / 2;
+                            break;
+                    }
+                }
+            }
+            else
+            {
+
+            }
         }
+        //updateLoop();
     }
     /// <summary>
     /// 设置物品属性
@@ -382,9 +544,9 @@ public class BuildSystem : MonoBehaviour
         thing.postionX = m_flyCube.transform.position.x;
         thing.postionY = m_flyCube.transform.position.y;
         thing.postionZ = m_flyCube.transform.position.z;
-        thing.rotationX = m_flyCube.transform.rotation.x;
-        thing.rotationY = m_flyCube.transform.rotation.y;
-        thing.rotationZ = m_flyCube.transform.rotation.z;
+        thing.rotationX = m_flyCube.transform.rotation.eulerAngles.x;
+        thing.rotationY = m_flyCube.transform.rotation.eulerAngles.y;
+        thing.rotationZ = m_flyCube.transform.rotation.eulerAngles.z;
         //暂时不管这东西，先设置为xyz全部为true
         thing.FreezePostion = true;
         thing.FreezeRotation = true;

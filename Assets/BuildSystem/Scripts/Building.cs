@@ -124,6 +124,7 @@ public class Building : MonoBehaviour
         }
         else
         {
+
             if (collision.collider.GetComponent<Building>().getNowParent() != transform.gameObject)
             {
                 collision.collider.GetComponent<Renderer>().material.color = bSystem.colorList[1];
@@ -184,6 +185,10 @@ public class Building : MonoBehaviour
 
     private void OnDestroy()
     {
-        
+        parentObj = null;
+        otherList.Clear();
+        bSystem = null;
+        self = null;
+        other = null;
     }
 }

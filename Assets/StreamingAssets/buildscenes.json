@@ -1,0 +1,112 @@
+{
+  "buildScene": [
+    {
+      "buildThings": [
+        {
+          "thingName": "Cylinder_5",
+          "thingParentName": "Floor",
+          "thingType": 2,
+          "thingID": 5,
+          "postionX": -0.121374249,
+          "postionY": 1.15,
+          "postionZ": 0.870455265,
+          "rotationX": 0.0,
+          "rotationY": 0.0,
+          "rotationZ": 0.0,
+          "isUseGravity": false,
+          "FreezePostion": true,
+          "FreezeRotation": true,
+          "isCPush": true,
+          "isPushed": true,
+          "LimitAround": true,
+          "isTerrin": false
+        },
+        {
+          "thingName": "Plane_6",
+          "thingParentName": "Wall1",
+          "thingType": 4,
+          "thingID": 6,
+          "postionX": -1.81881893,
+          "postionY": 3.95679617,
+          "postionZ": 2.34999967,
+          "rotationX": 0.0,
+          "rotationY": 90.0,
+          "rotationZ": 0.0,
+          "isUseGravity": false,
+          "FreezePostion": true,
+          "FreezeRotation": true,
+          "isCPush": true,
+          "isPushed": true,
+          "LimitAround": true,
+          "isTerrin": false
+        },
+        {
+          "thingName": "Cube1_7",
+          "thingParentName": "Wall1",
+          "thingType": 5,
+          "thingID": 7,
+          "postionX": 1.76711035,
+          "postionY": 3.613521,
+          "postionZ": 3.34999967,
+          "rotationX": 0.0,
+          "rotationY": 270.0,
+          "rotationZ": 0.0,
+          "isUseGravity": false,
+          "FreezePostion": true,
+          "FreezeRotation": true,
+          "isCPush": true,
+          "isPushed": true,
+          "LimitAround": true,
+          "isTerrin": false
+        },
+        {
+          "thingName": "Cylinder_4",
+          "thingParentName": "Floor",
+          "thingType": 2,
+          "thingID": 4,
+          "postionX": 0.5582297,
+          "postionY": 1.15,
+          "postionZ": 0.9265895,
+          "rotationX": 0.0,
+          "rotationY": 0.0,
+          "rotationZ": 0.0,
+          "isUseGravity": false,
+          "FreezePostion": true,
+          "FreezeRotation": true,
+          "isCPush": true,
+          "isPushed": true,
+          "LimitAround": true,
+          "isTerrin": false
+        },
+        {
+          "thingName": "Cylinder_4",
+          "thingParentName": "Floor",
+          "thingType": 2,
+          "thingID": 4,
+          "postionX": 0.0926021338,
+          "postionY": 1.15,
+          "postionZ": 0.954820633,
+          "rotationX": 0.0,
+          "rotationY": 0.0,
+          "rotationZ": 0.0,
+          "isUseGravity": false,
+          "FreezePostion": true,
+          "FreezeRotation": true,
+          "isCPush": true,
+          "isPushed": true,
+          "LimitAround": true,
+          "isTerrin": false
+        }
+      ],
+      "buildSceneName": "buildScene1"
+    },
+    {
+      "buildThings": [],
+      "buildSceneName": "buildScene2"
+    },
+    {
+      "buildThings": [],
+      "buildSceneName": "buildScene3"
+    }
+  ]
+}
