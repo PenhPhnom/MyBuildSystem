@@ -262,13 +262,7 @@ public class BuildSystem : MonoBehaviour
         var loadModle = JsonConvert.DeserializeObject<BuildScenes>(buildStr);
         loadModle.buildScene[0].buildThings.Clear();
         var writeMode = JsonConvert.SerializeObject(loadModle, Formatting.Indented);
-#if UNITY_EDITOR
-        ThingsManager.Instance.JsonModify(buildStr, writeMode);
-#elif UNITY_ANDROID
-        ThingsManager.Instance.JsonModify(buildStr, writeMode);
-#elif UNITY_IPHONE
-        ThingsManager.Instance.JsonModify(buildStr, writeMode);
-#endif
+        ThingsManager.Instance.setStr(ref buildStr, writeMode);
         for (int i = 0; i < m_buildRoot.childCount; i++)
         {
             Destroy(m_buildRoot.GetChild(i).gameObject);
