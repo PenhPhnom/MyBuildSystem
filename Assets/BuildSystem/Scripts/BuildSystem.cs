@@ -66,7 +66,8 @@ public class BuildSystem : MonoBehaviour
     public Text t;
     public bool isHold = false;
     public ThirdCamera mainCameraCom;
-
+    string buildStr = "";
+    string thingStr = "";
     public void Start()
     {
         m_buildRoot = transform.Find("buildings");
@@ -89,7 +90,148 @@ public class BuildSystem : MonoBehaviour
             colorList.Add(colorList[1]);
         }
         mainCameraCom.center = socket.transform;
+        //test 写死json
+        addTestJsonthings();
+        addTestJsonBuild();
     }
+
+    private void addTestJsonBuild()
+    {
+        BuildScenes buildScenes = new BuildScenes();
+        buildScenes.buildScene.Clear();
+        buildScenes.buildScene.Add(new BuildScene
+        {
+            buildSceneName = "room1",
+            buildThings = {}
+        });
+        var writeMode = JsonConvert.SerializeObject(buildScenes, Formatting.Indented);
+        buildStr = writeMode;
+    }
+
+    private void addTestJsonthings()
+    {
+        Things things = new Things();
+        things.thingsArr.Clear();
+        things.thingsArr.Add(new BuildSceneItem
+        {
+            thingName = "Cube",
+            thingParentName = "",
+            thingType = 0,
+            thingID = 0,
+            postionX = 0,
+            postionY = 0,
+            postionZ = 0,
+            rotationX = 0,
+            rotationY = 0,
+            rotationZ = 0,
+            isUseGravity = false,
+            FreezePostion = true,
+            FreezeRotation = true,
+            isCPush = true,
+            isPushed = true,
+            LimitAround = true,
+            isTerrin = false
+        });
+        things.thingsArr.Add(new BuildSceneItem
+        {
+            thingName = "Capsule",
+            thingParentName = "",
+            thingType = 1,
+            thingID = 0,
+            postionX = 0,
+            postionY = 0,
+            postionZ = 0,
+            rotationX = 0,
+            rotationY = 0,
+            rotationZ = 0,
+            isUseGravity = false,
+            FreezePostion = true,
+            FreezeRotation = true,
+            isCPush = true,
+            isPushed = true,
+            LimitAround = true,
+            isTerrin = false
+        }); things.thingsArr.Add(new BuildSceneItem
+        {
+            thingName = "Cylinder",
+            thingParentName = "",
+            thingType = 2,
+            thingID = 0,
+            postionX = 0,
+            postionY = 0,
+            postionZ = 0,
+            rotationX = 0,
+            rotationY = 0,
+            rotationZ = 0,
+            isUseGravity = false,
+            FreezePostion = true,
+            FreezeRotation = true,
+            isCPush = true,
+            isPushed = true,
+            LimitAround = true,
+            isTerrin = false
+        }); things.thingsArr.Add(new BuildSceneItem
+        {
+            thingName = "Sphere",
+            thingParentName = "",
+            thingType = 3,
+            thingID = 0,
+            postionX = 0,
+            postionY = 0,
+            postionZ = 0,
+            rotationX = 0,
+            rotationY = 0,
+            rotationZ = 0,
+            isUseGravity = false,
+            FreezePostion = true,
+            FreezeRotation = true,
+            isCPush = true,
+            isPushed = true,
+            LimitAround = true,
+            isTerrin = false
+        }); things.thingsArr.Add(new BuildSceneItem
+        {
+            thingName = "Plane",
+            thingParentName = "",
+            thingType = 4,
+            thingID = 0,
+            postionX = 0,
+            postionY = 0,
+            postionZ = 0,
+            rotationX = 0,
+            rotationY = 0,
+            rotationZ = 0,
+            isUseGravity = false,
+            FreezePostion = true,
+            FreezeRotation = true,
+            isCPush = true,
+            isPushed = true,
+            LimitAround = true,
+            isTerrin = false
+        }); things.thingsArr.Add(new BuildSceneItem
+        {
+            thingName = "Cube1",
+            thingParentName = "",
+            thingType = 5,
+            thingID = 0,
+            postionX = 0,
+            postionY = 0,
+            postionZ = 0,
+            rotationX = 0,
+            rotationY = 0,
+            rotationZ = 0,
+            isUseGravity = false,
+            FreezePostion = true,
+            FreezeRotation = true,
+            isCPush = true,
+            isPushed = true,
+            LimitAround = true,
+            isTerrin = false
+        }); 
+        var writeMode = JsonConvert.SerializeObject(things, Formatting.Indented);
+        thingStr = writeMode;
+    }
+
     /// <summary>
     /// 观察者模式
     /// </summary>
@@ -117,22 +259,15 @@ public class BuildSystem : MonoBehaviour
     public void btnUnLoadJSON()
     {
         t.text = "卸载成功";
-#if UNITY_EDITOR
-        string content = ThingsManager.Instance.JsonLoad(jsonPath);
-#elif UNITY_ANDROID
-        string content = ThingsManager.Instance.JsonLoad(Application.persistentDataPath + "/buildscenes.json");
-#elif UNITY_IPHONE
-        string content = ThingsManager.Instance.JsonLoad(Application.streamingAssetsPath + "/buildscenes.json");
-#endif
-        var loadModle = JsonConvert.DeserializeObject<BuildScenes>(content);
+        var loadModle = JsonConvert.DeserializeObject<BuildScenes>(buildStr);
         loadModle.buildScene[0].buildThings.Clear();
         var writeMode = JsonConvert.SerializeObject(loadModle, Formatting.Indented);
 #if UNITY_EDITOR
-        ThingsManager.Instance.JsonModify(jsonPath, writeMode);
+        ThingsManager.Instance.JsonModify(buildStr, writeMode);
 #elif UNITY_ANDROID
-        ThingsManager.Instance.JsonModify(Application.persistentDataPath + "/buildscenes.json", writeMode);
+        ThingsManager.Instance.JsonModify(buildStr, writeMode);
 #elif UNITY_IPHONE
-        ThingsManager.Instance.JsonModify(Application.streamingAssetsPath + "/buildscenes.json", writeMode);
+        ThingsManager.Instance.JsonModify(buildStr, writeMode);
 #endif
         for (int i = 0; i < m_buildRoot.childCount; i++)
         {
@@ -166,14 +301,7 @@ public class BuildSystem : MonoBehaviour
     //}
     public void btnLoadJSON()
     {
-#if UNITY_EDITOR
-        string content = ThingsManager.Instance.JsonLoad(jsonPath);
-#elif UNITY_ANDROID
-        string content = ThingsManager.Instance.JsonLoad(Application.persistentDataPath + "/buildscenes.json");
-#elif UNITY_IPHONE
-        string content = ThingsManager.Instance.JsonLoad(Application.streamingAssetsPath + "/buildscenes.json");
-#endif
-        var loadModle = JsonConvert.DeserializeObject<BuildScenes>(content);
+        var loadModle = JsonConvert.DeserializeObject<BuildScenes>(buildStr);
         List<BuildSceneItem> things = loadModle.buildScene[0].buildThings;
         if (m_buildRoot.childCount == 0)
         {
@@ -388,14 +516,7 @@ public class BuildSystem : MonoBehaviour
                                 isHold = true;
                                 //设置物件属性
                                 setThingAttributes(thing);
-#if UNITY_EDITOR
-                                ThingsManager.Instance.DelBuildThings(jsonPath, 0, m_flyCubeBuilding.thingID);
-#elif UNITY_ANDROID
-        ThingsManager.Instance.DelBuildThings(Application.persistentDataPath + "/buildscenes.json", 0, m_flyCubeBuilding.thingID);
-#elif UNITY_IPHONE
-        ThingsManager.Instance.DelBuildThings(Application.streamingAssetsPath + "/buildscenes.json", 0, m_flyCubeBuilding.thingID);
-#endif
-
+                                ThingsManager.Instance.DelBuildThingsStr(ref buildStr, 0, m_flyCubeBuilding.thingID);
                             }
                             else
                             {
@@ -426,13 +547,7 @@ public class BuildSystem : MonoBehaviour
                     var thing = new BuildSceneItem();
                     //设置物件属性
                     setThingAttributes(thing);
-#if UNITY_EDITOR
-                    ThingsManager.Instance.AddBuildThings(jsonPath, 0, thing);
-#elif UNITY_ANDROID
-                            ThingsManager.Instance.AddBuildThings(Application.persistentDataPath + "/buildscenes.json", 0, thing);
-#elif UNITY_IPHONE
-                            ThingsManager.Instance.AddBuildThings(Application.streamingAssetsPath + "/buildscenes.json", 0, thing);
-#endif
+                    ThingsManager.Instance.AddBuildThingsStr(ref buildStr, 0, thing);
                     m_flyCube.layer = 0;
                     //恢复正常的位置
                     offsetBuildingReset(pt);

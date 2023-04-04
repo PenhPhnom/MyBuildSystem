@@ -11,6 +11,15 @@ public class ThingsManager : Singleton<ThingsManager>
     {
 
     }
+    internal GameObject getGameObject(string objName)
+    {
+        var bs = GameObject.Find(objName);
+        return bs;
+    }
+    internal void setStr(ref string str,string newStr)
+    {
+        str = newStr;
+    }
     /// <summary>
     /// 打开/关闭重力
     /// </summary>
@@ -163,6 +172,34 @@ public class ThingsManager : Singleton<ThingsManager>
     {
         m_replaces.GetComponent<Renderer>().materials[index] = new Material(Shader.Find(shaderName)) ;
     }
+    //测试
+    /// <summary>
+    /// 添加配置
+    /// </summary>
+    /// <param name="str">测试json</param>
+    /// <param name="sIndex">场景id</param>
+    /// <param name="item">添加的物品</param>
+    public void AddBuildThingsStr(ref string str, int sIndex, BuildSceneItem item)
+    {
+        var loadModle = JsonConvert.DeserializeObject<BuildScenes>(str);
+        loadModle.buildScene[sIndex].buildThings.Add(item);
+        var writeMode = JsonConvert.SerializeObject(loadModle, Formatting.Indented);
+        setStr(ref str, writeMode);
+    }
+    /// <summary>
+    /// 删除配置
+    /// </summary>
+    /// <param name="str">测试json</param>
+    /// <param name="sIndex">场景id</param>
+    /// <param name="tIndex">物品id</param>
+    public void DelBuildThingsStr(ref string str, int sIndex, int tIndex)
+    {
+        var loadModle = JsonConvert.DeserializeObject<BuildScenes>(str);
+        BuildSceneItem item = eachItem(loadModle.buildScene[sIndex].buildThings, tIndex);
+        loadModle.buildScene[sIndex].buildThings.Remove(item);
+        var writeMode = JsonConvert.SerializeObject(loadModle, Formatting.Indented);
+        setStr(ref str, writeMode);
+    }
 }
 /// <summary>
 /// 相机的属性
@@ -189,5 +226,6 @@ public class CameraState:Singleton<CameraState>
         Debug.Log(Rot);
         return Rot;
     }
+
 }
 
