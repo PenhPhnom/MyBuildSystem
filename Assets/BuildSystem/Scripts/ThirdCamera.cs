@@ -2,10 +2,10 @@
 
 public class ThirdCamera : MonoBehaviour
 {
-    public Transform target = null;     // 目标玩家
-    public Transform center = null;     // 目标玩家
-    Vector2 oldPosition1;
-    Vector2 oldPosition2;
+    public Transform Target = null;     // 目标玩家
+    public Transform Center = null;     // 目标玩家
+   private Vector2 oldPosition1;
+    private Vector2 oldPosition2;
     // 缩放系数  
     internal float distanceY = 0;
     internal float distanceZ = 0;
@@ -14,7 +14,7 @@ public class ThirdCamera : MonoBehaviour
 
     void Update()
     {
-        if (target)
+        if (Target)
         {
             //不是双指就关闭
             if (Input.touchCount > 1)
@@ -27,17 +27,17 @@ public class ThirdCamera : MonoBehaviour
                     var y = transform.position.y;
                     var z = transform.position.z;
                     //靠近
-                    if (isEnlarge(oldPosition1, oldPosition2, tempPosition1, tempPosition2))
+                    if (IsEnlarge(oldPosition1, oldPosition2, tempPosition1, tempPosition2))
                     {
                         newPos = new Vector3(0, y - 0.3f, z + 0.3f);
                         transform.position = newPos;
-                        transform.LookAt(target);
+                        transform.LookAt(Target);
                     }
                     else//远离
                     {
                         newPos = new Vector3(0, y + 0.3f, z - 0.3f);
                         transform.position = newPos;
-                        transform.LookAt(target);
+                        transform.LookAt(Target);
                     }
                     //备份上一次触摸点的位置，用于对比   
                     oldPosition1 = tempPosition1;
@@ -48,7 +48,7 @@ public class ThirdCamera : MonoBehaviour
             {
                 if (Input.GetTouch(0).phase == TouchPhase.Moved)
                 {
-                    camerarotate();
+                    Camerarotate();
                 }
             }
         }
@@ -60,7 +60,7 @@ public class ThirdCamera : MonoBehaviour
             {
                 if(!m_buildSystem.isHold)
                 {
-                    camerarotateH();
+                    CamerarotateH();
                 }
             }
         }
@@ -74,7 +74,7 @@ public class ThirdCamera : MonoBehaviour
     /// <param name="nP1"></param>
     /// <param name="nP2"></param>
     /// <returns></returns>
-    bool isEnlarge(Vector2 oP1, Vector2 oP2, Vector2 nP1, Vector2 nP2)
+    bool IsEnlarge(Vector2 oP1, Vector2 oP2, Vector2 nP1, Vector2 nP2)
     {
         //函数传入上一次触摸两点的位置与本次触摸两点的位置计算出用户的手势   
         var leng1 = Mathf.Sqrt((oP1.x - oP2.x) * (oP1.x - oP2.x) + (oP1.y - oP2.y) * (oP1.y - oP2.y));
@@ -92,22 +92,22 @@ public class ThirdCamera : MonoBehaviour
     }
 
     public float speed = 1;
-    private void camerarotate() //摄像机围绕目标旋转操作
+    private void Camerarotate() //摄像机围绕目标旋转操作
     {
    
-            transform.RotateAround(target.position, Vector3.up, speed * Time.deltaTime); //摄像机围绕目标旋转
+            transform.RotateAround(Target.position, Vector3.up, speed * Time.deltaTime); //摄像机围绕目标旋转
             var mouse_x = Input.GetAxis("Mouse X");//获取鼠标X轴移动
             var mouse_y = -Input.GetAxis("Mouse Y");//获取鼠标Y轴移动
             if(Mathf.Abs(mouse_x * 5) <20)
             {
-                transform.RotateAround(target.transform.position, Vector3.up, mouse_x * 5);
+                transform.RotateAround(Target.transform.position, Vector3.up, mouse_x * 5);
             }
             if (Mathf.Abs(mouse_y * 5) < 20)
             {
-                transform.RotateAround(target.transform.position, transform.right, mouse_y * 5);
+                transform.RotateAround(Target.transform.position, transform.right, mouse_y * 5);
             }
     }
-    private void camerarotateH() //摄像机围绕目标旋转操作
+    private void CamerarotateH() //摄像机围绕目标旋转操作
     {
         //转相机父节点
         //以后可能换成Cinemachine

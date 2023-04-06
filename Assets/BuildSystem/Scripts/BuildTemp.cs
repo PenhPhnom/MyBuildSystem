@@ -23,13 +23,13 @@ public class BuildSceneItem
     public float rotationX;
     public float rotationY;
     public float rotationZ;
-    public bool isUseGravity;
+    public bool IsUseGravity;
     public bool FreezePostion;
     public bool FreezeRotation;
-    public bool isCPush;
-    public bool isPushed;
+    public bool IsCPush;
+    public bool IsPushed;
     public bool LimitAround;
-    public bool isTerrin;
+    public bool IsTerrin;
 }
 
 public class BuildScenes

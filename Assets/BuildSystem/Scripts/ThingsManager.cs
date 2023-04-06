@@ -6,17 +6,17 @@ using UnityEngine;
 
 public class ThingsManager : Singleton<ThingsManager>
 {
-    List<string> prefabs = new List<string>();
+   private List<string> m_Prefabs = new List<string>();
     public override void Init()
     {
 
     }
-    internal GameObject getGameObject(string objName)
+    internal GameObject GetGameObject(string objName)
     {
         var bs = GameObject.Find(objName);
         return bs;
     }
-    internal void setStr(ref string str,string newStr)
+    internal void SetStr(ref string str,string newStr)
     {
         str = newStr;
     }
@@ -89,14 +89,14 @@ public class ThingsManager : Singleton<ThingsManager>
 
     internal void initCameraState()
     {
-        CameraState.Instance.setPos(Camera.main.transform.position);
-        CameraState.Instance.setRot(Camera.main.transform.rotation);
+        CameraState.Instance.SetPos(Camera.main.transform.position);
+        CameraState.Instance.SetRot(Camera.main.transform.rotation);
     }
     internal void SetCameraState()
     {
         //相机恢复
-        Camera.main.transform.position = CameraState.Instance.getPos();
-        Camera.main.transform.rotation = CameraState.Instance.getRot();
+        Camera.main.transform.position = CameraState.Instance.GetPos();
+        Camera.main.transform.rotation = CameraState.Instance.GetRot();
     }
     /// <summary>
     /// 添加配置
@@ -122,7 +122,7 @@ public class ThingsManager : Singleton<ThingsManager>
     {
         string content = JsonLoad(jpath);
         var loadModle = JsonConvert.DeserializeObject<BuildScenes>(content);
-        BuildSceneItem item = eachItem(loadModle.buildScene[sIndex].buildThings, tIndex);
+        BuildSceneItem item = EachItem(loadModle.buildScene[sIndex].buildThings, tIndex);
         loadModle.buildScene[sIndex].buildThings.Remove(item);
         var writeMode = JsonConvert.SerializeObject(loadModle, Formatting.Indented);
         JsonModify(jpath, writeMode);
@@ -133,7 +133,7 @@ public class ThingsManager : Singleton<ThingsManager>
     /// <param name="buildThings">物品列表</param>
     /// <param name="tIndex">物品id</param>
     /// <returns></returns>
-    public BuildSceneItem eachItem(List<BuildSceneItem> buildThings, int tIndex)
+    public BuildSceneItem EachItem(List<BuildSceneItem> buildThings, int tIndex)
     {
         foreach (var item in buildThings)
         {
@@ -145,9 +145,9 @@ public class ThingsManager : Singleton<ThingsManager>
         return null;
     }
 
-    public List<string> getThingsName()
+    public List<string> GetThingsName()
     {
-        return prefabs;
+        return m_Prefabs;
     }
     /// <summary>
     /// 更换材质球
@@ -184,7 +184,7 @@ public class ThingsManager : Singleton<ThingsManager>
         var loadModle = JsonConvert.DeserializeObject<BuildScenes>(str);
         loadModle.buildScene[sIndex].buildThings.Add(item);
         var writeMode = JsonConvert.SerializeObject(loadModle, Formatting.Indented);
-        setStr(ref str, writeMode);
+        SetStr(ref str, writeMode);
     }
     /// <summary>
     /// 删除配置
@@ -195,10 +195,10 @@ public class ThingsManager : Singleton<ThingsManager>
     public void DelBuildThingsStr(ref string str, int sIndex, int tIndex)
     {
         var loadModle = JsonConvert.DeserializeObject<BuildScenes>(str);
-        BuildSceneItem item = eachItem(loadModle.buildScene[sIndex].buildThings, tIndex);
+        BuildSceneItem item = EachItem(loadModle.buildScene[sIndex].buildThings, tIndex);
         loadModle.buildScene[sIndex].buildThings.Remove(item);
         var writeMode = JsonConvert.SerializeObject(loadModle, Formatting.Indented);
-        setStr(ref str, writeMode);
+        SetStr(ref str, writeMode);
     }
 }
 /// <summary>
@@ -208,20 +208,20 @@ public class CameraState:Singleton<CameraState>
 {
     public Vector3 pos;
     public Quaternion Rot;
-    internal void setPos(Vector3 posValue)
+    internal void SetPos(Vector3 posValue)
     {
         pos = posValue;
     }
-    internal void setRot(Quaternion RotValue)
+    internal void SetRot(Quaternion RotValue)
     {
         Rot = RotValue;
     }
-    internal Vector3 getPos()
+    internal Vector3 GetPos()
     {
         Debug.Log(pos);
         return pos;
     }
-    internal Quaternion getRot()
+    internal Quaternion GetRot()
     {
         Debug.Log(Rot);
         return Rot;

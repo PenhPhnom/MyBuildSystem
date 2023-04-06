@@ -60,8 +60,6 @@ public class BuildSystem : MonoBehaviour
 
     public Material meshRender = null;
     public Renderer rend;
-    public Texture texture;
-    public string jsonPath;
     public float suspendOffset = 0.1f;
     public Text t;
     public bool isHold = false;
@@ -89,7 +87,7 @@ public class BuildSystem : MonoBehaviour
             colorList.Add(colorList[0]);
             colorList.Add(colorList[1]);
         }
-        mainCameraCom.center = socket.transform;
+        mainCameraCom.Center = socket.transform;
         //test 写死json
         addTestJsonthings();
         addTestJsonBuild();
@@ -124,13 +122,13 @@ public class BuildSystem : MonoBehaviour
             rotationX = 0,
             rotationY = 0,
             rotationZ = 0,
-            isUseGravity = false,
+            IsUseGravity = false,
             FreezePostion = true,
             FreezeRotation = true,
-            isCPush = true,
-            isPushed = true,
+            IsCPush = true,
+            IsPushed = true,
             LimitAround = true,
-            isTerrin = false
+            IsTerrin = false
         });
         things.thingsArr.Add(new BuildSceneItem
         {
@@ -144,13 +142,13 @@ public class BuildSystem : MonoBehaviour
             rotationX = 0,
             rotationY = 0,
             rotationZ = 0,
-            isUseGravity = false,
+            IsUseGravity = false,
             FreezePostion = true,
             FreezeRotation = true,
-            isCPush = true,
-            isPushed = true,
+            IsCPush = true,
+            IsPushed = true,
             LimitAround = true,
-            isTerrin = false
+            IsTerrin = false
         }); things.thingsArr.Add(new BuildSceneItem
         {
             thingName = "Cylinder",
@@ -163,13 +161,13 @@ public class BuildSystem : MonoBehaviour
             rotationX = 0,
             rotationY = 0,
             rotationZ = 0,
-            isUseGravity = false,
+            IsUseGravity = false,
             FreezePostion = true,
             FreezeRotation = true,
-            isCPush = true,
-            isPushed = true,
+            IsCPush = true,
+            IsPushed = true,
             LimitAround = true,
-            isTerrin = false
+            IsTerrin = false
         }); things.thingsArr.Add(new BuildSceneItem
         {
             thingName = "Sphere",
@@ -182,13 +180,13 @@ public class BuildSystem : MonoBehaviour
             rotationX = 0,
             rotationY = 0,
             rotationZ = 0,
-            isUseGravity = false,
+            IsUseGravity = false,
             FreezePostion = true,
             FreezeRotation = true,
-            isCPush = true,
-            isPushed = true,
+            IsCPush = true,
+            IsPushed = true,
             LimitAround = true,
-            isTerrin = false
+            IsTerrin = false
         }); things.thingsArr.Add(new BuildSceneItem
         {
             thingName = "Plane",
@@ -201,13 +199,13 @@ public class BuildSystem : MonoBehaviour
             rotationX = 0,
             rotationY = 0,
             rotationZ = 0,
-            isUseGravity = false,
+            IsUseGravity = false,
             FreezePostion = true,
             FreezeRotation = true,
-            isCPush = true,
-            isPushed = true,
+            IsCPush = true,
+            IsPushed = true,
             LimitAround = true,
-            isTerrin = false
+            IsTerrin = false
         }); things.thingsArr.Add(new BuildSceneItem
         {
             thingName = "Cube1",
@@ -220,13 +218,13 @@ public class BuildSystem : MonoBehaviour
             rotationX = 0,
             rotationY = 0,
             rotationZ = 0,
-            isUseGravity = false,
+            IsUseGravity = false,
             FreezePostion = true,
             FreezeRotation = true,
-            isCPush = true,
-            isPushed = true,
+            IsCPush = true,
+            IsPushed = true,
             LimitAround = true,
-            isTerrin = false
+            IsTerrin = false
         }); 
         var writeMode = JsonConvert.SerializeObject(things, Formatting.Indented);
         thingStr = writeMode;
@@ -244,7 +242,7 @@ public class BuildSystem : MonoBehaviour
             mainCameraCom.newPos = transform.position;
             mainCameraCom.distanceY = mainCameraCom.newPos.y;
             mainCameraCom.distanceZ = mainCameraCom.newPos.z;
-            mainCameraCom.transform.LookAt(mainCameraCom.target);
+            mainCameraCom.transform.LookAt(mainCameraCom.Target);
         }
         else
         {
@@ -252,7 +250,7 @@ public class BuildSystem : MonoBehaviour
 
             ThingsManager.Instance.SetCameraState();
 
-            mainCameraCom.target = null;
+            mainCameraCom.Target = null;
         }
     }
 
@@ -262,7 +260,7 @@ public class BuildSystem : MonoBehaviour
         var loadModle = JsonConvert.DeserializeObject<BuildScenes>(buildStr);
         loadModle.buildScene[0].buildThings.Clear();
         var writeMode = JsonConvert.SerializeObject(loadModle, Formatting.Indented);
-        ThingsManager.Instance.setStr(ref buildStr, writeMode);
+        ThingsManager.Instance.SetStr(ref buildStr, writeMode);
         for (int i = 0; i < m_buildRoot.childCount; i++)
         {
             Destroy(m_buildRoot.GetChild(i).gameObject);
@@ -306,16 +304,15 @@ public class BuildSystem : MonoBehaviour
                 GameObject thing = Instantiate(Buildings[things[i].thingType], m_buildRoot);
                 thing.transform.position = new Vector3(things[i].postionX, things[i].postionY, things[i].postionZ);
                 thing.transform.rotation = Quaternion.Euler(things[i].rotationX, things[i].rotationY, things[i].rotationZ);
-                Debug.Log(thing.transform.rotation);
                 thing.name = things[i].thingName;
                 AddMissCom(thing);
                 Building b = thing.GetComponent<Building>();
-                b.isCPush = things[i].isCPush;
+                b.IsCPush = things[i].IsCPush;
                 b.limitAround = things[i].LimitAround;
-                b.isPushed = things[i].isPushed;
+                b.isPushed = things[i].IsPushed;
                 b.thingID = LoopID;
                 Rigidbody r = thing.GetComponent<Rigidbody>();
-                r.useGravity = things[i].isUseGravity;
+                r.useGravity = things[i].IsUseGravity;
                 r.constraints =
                     RigidbodyConstraints.FreezePositionZ |
                     RigidbodyConstraints.FreezeRotationZ |
@@ -324,8 +321,8 @@ public class BuildSystem : MonoBehaviour
                     RigidbodyConstraints.FreezePositionX |
                     RigidbodyConstraints.FreezeRotationX;
                 //设置颜色
-                thing.GetComponent<Building>().normalColor = thing.GetComponent<Renderer>().material.color;
-                thing.GetComponent<Building>().thingType = things[i].thingType;
+                b.normalColor = thing.GetComponent<Renderer>().material.color;
+                b.thingType = things[i].thingType;
                 thing.layer = 0;
             }
         }
@@ -407,7 +404,7 @@ public class BuildSystem : MonoBehaviour
                 }
                 AddMissCom(m_flyCube);
                 Building b = m_flyCubeBuilding;
-                b.isCPush = true;
+                b.IsCPush = true;
                 b.limitAround = true;
 
                 Rigidbody r = m_flyCube.GetComponent<Rigidbody>();
@@ -430,7 +427,7 @@ public class BuildSystem : MonoBehaviour
             GameObject m_new = Instantiate(Buildings[id], m_buildRoot);
             m_new.transform.position = m_replaces.transform.position;
             m_new.transform.rotation = m_replaces.transform.rotation;
-            m_new.GetComponent<Building>().setIsPushed(true);
+            m_new.GetComponent<Building>().SetIsPushed(true);
             m_new.layer = 0;
             m_new.GetComponent<Renderer>().material.color = m_replaces.GetComponent<Building>().normalColor;
             DestroyImmediate(m_replaces);
@@ -478,7 +475,7 @@ public class BuildSystem : MonoBehaviour
                     //判断不是地板
                     if (!hitThings.GetComponent<Building>().isTerrin)
                     {
-                        mainCameraCom.target = hitThings.transform;
+                        mainCameraCom.Target = hitThings.transform;
                     }
                 }
             }
@@ -501,7 +498,7 @@ public class BuildSystem : MonoBehaviour
                                 m_flyCube.layer = 1;
                                 m_flyCubeRender = m_flyCube.GetComponent<Renderer>();
                                 m_flyCubeBuilding = m_flyCube.GetComponent<Building>();
-                                m_flyCubeBuilding.setIsPushed(false);
+                                m_flyCubeBuilding.SetIsPushed(false);
                                 //设置颜色
                                 m_flyCubeRender.material.color = colorList[0];
                                 //去掉编号
@@ -515,7 +512,7 @@ public class BuildSystem : MonoBehaviour
                             else
                             {
                                 m_replaces = hit.collider.gameObject;
-                                m_replaces.GetComponent<Building>().setIsPushed(true);
+                                m_replaces.GetComponent<Building>().SetIsPushed(true);
                                 m_replaces.layer = 0;
                             }
                         }
@@ -534,7 +531,7 @@ public class BuildSystem : MonoBehaviour
                 else
                 {
                     m_flyCubeRender.material.color = m_flyCubeBuilding.normalColor;
-                    m_flyCubeBuilding.setIsPushed(true);
+                    m_flyCubeBuilding.SetIsPushed(true);
                     LoopID++;
                     m_flyCubeBuilding.thingID = LoopID;
                     m_flyCube.name = m_flyCube.name.Replace("(Clone)", "") + "_" + LoopID;
@@ -568,7 +565,7 @@ public class BuildSystem : MonoBehaviour
             //选定某一个层，进行移动
             if (Physics.Raycast(ray, out hit, Mathf.Infinity, maskLayer))
             {
-                m_flyCubeBuilding.setNowParent(hit.collider.gameObject);
+                m_flyCubeBuilding.SetNowParent(hit.collider.GetComponent<Building>());
                 // 判断socket与物品的方向
                 pt = posType(hit.collider.transform);
                 //判断是否可以堆叠摆放
@@ -645,10 +642,10 @@ public class BuildSystem : MonoBehaviour
         {
             thing.thingParentName = m_flyCubeBuilding.parentObj.name;
         }
-        thing.isUseGravity = m_flyCubeBuilding.IsGravity;
-        thing.isCPush = m_flyCubeBuilding.isCPush;
-        thing.isPushed = m_flyCubeBuilding.isPushed;
-        thing.isTerrin = m_flyCubeBuilding.isTerrin;
+        thing.IsUseGravity = m_flyCubeBuilding.IsGravity;
+        thing.IsCPush = m_flyCubeBuilding.IsCPush;
+        thing.IsPushed = m_flyCubeBuilding.isPushed;
+        thing.IsTerrin = m_flyCubeBuilding.isTerrin;
         thing.LimitAround = m_flyCubeBuilding.limitAround;
         thing.postionX = m_flyCube.transform.position.x;
         thing.postionY = m_flyCube.transform.position.y;
