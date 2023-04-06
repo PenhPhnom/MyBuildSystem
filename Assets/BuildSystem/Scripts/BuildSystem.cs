@@ -87,7 +87,7 @@ public class BuildSystem : MonoBehaviour
             colorList.Add(colorList[0]);
             colorList.Add(colorList[1]);
         }
-        mainCameraCom.Center = socket.transform;
+        mainCameraCom.SetForwordCenter(socket.transform);
         //test 写死json
         addTestJsonthings();
         addTestJsonBuild();
@@ -242,7 +242,7 @@ public class BuildSystem : MonoBehaviour
             mainCameraCom.newPos = transform.position;
             mainCameraCom.distanceY = mainCameraCom.newPos.y;
             mainCameraCom.distanceZ = mainCameraCom.newPos.z;
-            mainCameraCom.transform.LookAt(mainCameraCom.Target);
+             mainCameraCom.transform.LookAt(mainCameraCom.GetForwordTarget());
         }
         else
         {
@@ -250,7 +250,7 @@ public class BuildSystem : MonoBehaviour
 
             ThingsManager.Instance.SetCameraState();
 
-            mainCameraCom.Target = null;
+            mainCameraCom.SetForwordTarget(null);
         }
     }
 
@@ -475,7 +475,7 @@ public class BuildSystem : MonoBehaviour
                     //判断不是地板
                     if (!hitThings.GetComponent<Building>().isTerrin)
                     {
-                        mainCameraCom.Target = hitThings.transform;
+                        mainCameraCom.SetForwordTarget(hitThings.transform);
                     }
                 }
             }

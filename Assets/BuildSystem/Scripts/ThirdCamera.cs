@@ -2,8 +2,8 @@
 
 public class ThirdCamera : MonoBehaviour
 {
-    public Transform Target = null;     // 目标玩家
-    public Transform Center = null;     // 目标玩家
+    public Transform Target = null;     // 围绕的目标
+    public Transform Center = null;     // 相机围绕中心
    private Vector2 oldPosition1;
     private Vector2 oldPosition2;
     // 缩放系数  
@@ -117,5 +117,20 @@ public class ThirdCamera : MonoBehaviour
         {
             transform.RotateAround(Camera.main.transform.parent.position, Vector3.up, mouse_x * 5);
         }
+    }
+        //设置朝向物体
+    public void SetForwordTarget(Transform tran)
+    {
+        Target = tran;
+    }
+    //设置朝向物体
+    public Transform GetForwordTarget()
+    {
+        return Target;
+    }
+    //设置相机旋转中心
+    public void SetForwordCenter(Transform tran)
+    {
+        Center = tran;
     }
 }
